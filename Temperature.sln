@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temperature", "Temperature\Temperature.csproj", "{F542FAF4-114C-4E6A-9808-D05E98679B1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvester", "ConsoleApp1\Harvester.csproj", "{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLib", "ClassLib\ClassLib.csproj", "{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C1EF483-F573-4B85-859A-8F4BD053F858}
+	EndGlobalSection
+EndGlobal
