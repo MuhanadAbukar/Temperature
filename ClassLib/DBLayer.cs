@@ -1,29 +1,40 @@
 ﻿using Newtonsoft.Json;
+using SQLWeather;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reflection.Emit;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Web.UI.WebControls;
-
+using WeatherData;
+using System.Globalization;
 namespace DBLayer
 {
     public class WebhookPost
     {
-        public string content { set; get; }
+        public Embed[] embeds { get; set; }
+        public class Embed
+        {
+            public string title { get; set; }
+            public string description { get; set; }
+        }
+
         public void PostWebhook(string content)
         {
-            var info = new WebhookPost()
+            var embed = new Embed()
             {
-                content = content,
+                title = "Weather Project Status",
+                description = content
             };
-            var js = JsonConvert.SerializeObject(info);
+            var info = new Embed[1];
+            info[0] = embed;
+            var js = "{\"embeds\":" + JsonConvert.SerializeObject(info) + "}";
             var _cl = new HttpClient();
             var pl = new StringContent(js, Encoding.UTF8, "application/json");
+            Console.WriteLine(js);
             _cl.PostAsync("https://discord.com/api/webhooks/1037668127242203136/gg8ne3IzPN49PD9q6xNLkvv2ciKclffnMh2QJ37mkx02bjHkzP2TP8L38udQvXav5AhB", pl);
         }
     }
@@ -31,7 +42,24 @@ namespace DBLayer
     {
         static string connstr = "Data Source=DESKTOP-QJBSGQ4\\MSSQLSERVER01;Initial Catalog=Harvester_Muhanad;Persist Security Info=True;User ID=sa;Password=muhanad123";
         static SqlConnection conn = new SqlConnection(connstr);
-        public WeatherData.Details GetPropertiesOfWeather()
+        private WeatherFromSQL CreateObjectFromSql(SqlDataReader reader)
+        {
+            var wt = new WeatherFromSQL
+            {
+                Year = (int)reader["Year"],
+                Month = (int)reader["Month"],
+                Day = (int)reader["Day"],
+                Hour = (int)reader["Hour"],
+                Temperature = (double)reader["Temperature"],
+                WindSpeed = (double)reader["WindSpeed"],
+                Precipitation = (double)reader["Precipitation"],
+                Humidity = (double)reader["Humidity"],
+                WindSpeedGust = (double)reader["WindSpeedGust"],
+                WindDirection = (double)reader["WindDirection"]
+            };
+            return wt;
+        }
+        public Details GetPropertiesOfWeather()
         {
             try
             {
@@ -44,51 +72,161 @@ namespace DBLayer
                 var properties = real.properties.timeseries[0].data.instant.details;
                 return properties;
             }
-            catch(Exception m)
+            catch (Exception m)
             {
                 var d = new WebhookPost();
-                d.PostWebhook(m.Message+ " <@568374878500159490>");
-                var d2 = new WeatherData.Details();
-                d2.air_temperature = 99999;
+                d.PostWebhook(m.Message + " <@568374878500159490>");
+                var d2 = new Details
+                {
+                    air_temperature = 99999
+                };
                 return d2;
             }
         }
-        
+
         public DataTable GetValidMonths()
         {
-            var x = new SqlCommand("select distinct Month from tempdatar order by month desc", conn);
+            var cmd = new SqlCommand("select distinct Month from tempdatar order by month desc", conn);
             conn.Open();
             var dt = new DataTable();
-            dt.Load(x.ExecuteReader());
+            dt.Load(cmd.ExecuteReader());
             conn.Close();
             return dt;
         }
         public DataTable GetValidYears()
         {
-            var x = new SqlCommand("select distinct year from tempdatar order by year desc", conn);
+            var cmd = new SqlCommand("select distinct year from tempdatar order by year desc", conn);
             conn.Open();
             var dt = new DataTable();
-            dt.Load(x.ExecuteReader());
+            dt.Load(cmd.ExecuteReader());
             conn.Close();
             return dt;
         }
+        public List<MonthDataFormat> GetLast24Hours()
+        {
+            var list = new List<MonthDataFormat>();
+            var z = new SqlCommand("select top(24)* from tempdatar order by id desc", conn);
+            conn.Open();
+            var reader = z.ExecuteReader();
+            while (reader.Read())
+            {
+                var angle = double.Parse(reader["WindDirection"].ToString());
+                var ws = new MonthDataFormat
+                {
+                    Hour = reader["Hour"] + ":00",
+                    Temperature = reader["Temperature"] + "°C",
+                    WindSpeed = reader["WindSpeed"] + " m/s",
+                    Precipitation = reader["Precipitation"] + " mm",
+                    Humidity = reader["Humidity"] + "%",
+                    WindSpeedGust = reader["WindSpeedGust"] + " m/s",
+                    WindDirection = AngleToDirection(angle),
+                };
+                list.Add(ws);
+            }
+            reader.Close();
+            conn.Close();
+            return list;
+        }
+        public List<WeatherFromSQL> GetLastMonth()
+        {
+            var list = new List<WeatherFromSQL>();
+            var z = new SqlCommand("select * from tempdatar order by id desc", conn);
+            conn.Open();
+            var reader = z.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(CreateObjectFromSql(reader));
+            }
+            reader.Close();
+            conn.Close();
+            return list;
+        }
+        public List<WeatherFromSQL> GetLastYear(int yr)
+        {
+            var list = new List<WeatherFromSQL>();
+            var z = new SqlCommand("select * from tempdatar where year=@year order by id desc", conn);
+            z.Parameters.AddWithValue("year",yr);
+            conn.Open();
+            var reader = z.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(CreateObjectFromSql(reader));
+            }
+            reader.Close();
+            conn.Close();
+            return list;
+        }
         
-        
-        public DataTable UpdateGridViewOnDropDown(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3) 
+        public List<WeatherFromSQL> GetAnyMonth(int month)
+        {
+            var list = new List<WeatherFromSQL>();
+            var z = new SqlCommand("select * from tempdatar where month = @month order by id desc", conn);
+            z.Parameters.AddWithValue("month", month);
+            conn.Open();
+            var reader = z.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(CreateObjectFromSql(reader));
+            }
+            reader.Close();
+            conn.Close();
+            return list;
+        }
+        private string AngleToDirection(double angle)
+        {
+            var index = int.Parse((Math.Round(((angle %= 360) < 0 ? angle + 360 : angle) / 45) % 8).ToString());
+            var directions = new[] { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East" };
+            return directions[index];
+        }
+
+        public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
         {
             var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            var dt = new DataTable();
-            var selectedmonth = Array.IndexOf(months1,DropDownList1.SelectedItem.Text)+1;
+            var selectedmonth = Array.IndexOf(months1, DropDownList1.SelectedItem.Text) + 1;
             var selectedday = DropDownList2.SelectedItem.Text;
             var selectedyear = DropDownList3.SelectedItem.Text;
-            var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month and day = @day",conn);
+            var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month and day = @day", conn);
             cmd.Parameters.AddWithValue("month", selectedmonth);
             cmd.Parameters.AddWithValue("year", selectedyear);
             cmd.Parameters.AddWithValue("day", selectedday);
             conn.Open();
-            dt.Load(cmd.ExecuteReader());
+            var list = new List<MonthDataFormat>();
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var angle = double.Parse(reader["WindDirection"].ToString());
+                var ws = new MonthDataFormat
+                {
+                    Hour = reader["Hour"] + ":00",
+                    Temperature = reader["Temperature"] + "°C",
+                    WindSpeed = reader["WindSpeed"]+" m/s",
+                    Precipitation = reader["Precipitation"] + " mm",
+                    Humidity = reader["Humidity"] + "%",
+                    WindSpeedGust = reader["WindSpeedGust"]+" m/s",
+                    WindDirection = AngleToDirection(angle),
+                };
+                list.Add(ws);
+            }
             conn.Close();
-            return dt;
+            return list;
+        }
+        public List<WeatherFromSQL> UpdateGridViewOnDropDownMonth(DropDownList Month, DropDownList Year)
+        {
+            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+            var selectedmonth = Array.IndexOf(months1, Month.SelectedItem.Text) + 1;
+            var selectedyear = Year.SelectedItem.Text;
+            var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month", conn);
+            cmd.Parameters.AddWithValue("month", selectedmonth);
+            cmd.Parameters.AddWithValue("year", selectedyear);
+            conn.Open();
+            var list = new List<WeatherFromSQL>();
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(CreateObjectFromSql(reader));
+            }
+            conn.Close();
+            return list;
         }
         public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation, float humidity, float gust, float direction)
         {
@@ -102,7 +240,7 @@ namespace DBLayer
             cmd.ExecuteNonQuery();
             conn.Close();
         }
-        public DataTable getReader(string query)
+        public DataTable GetReader(string query)
         {
             conn.Open();
             var cmd = new SqlCommand(query, conn);
@@ -111,9 +249,8 @@ namespace DBLayer
             dt.Load(reader);
             conn.Close();
             return dt;
-
         }
-        public void editColumn(string key, string keyname, string values, string tablename)
+        public void EditColumn(string key, string keyname, string values, string tablename)
         {
             conn.Open();
             var cmd = new SqlCommand($"update {tablename} set {values} where {keyname} = {key}", conn);

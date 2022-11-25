@@ -5,9 +5,13 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Temperature", "Temperature\Temperature.csproj", "{F542FAF4-114C-4E6A-9808-D05E98679B1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvester", "ConsoleApp1\Harvester.csproj", "{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBLayer", "ClassLib\DBLayer.csproj", "{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLib", "ClassLib\ClassLib.csproj", "{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{906CF092-FA64-44B9-A4AF-4CFBB70F2DF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessClasses", "BusinessClasses\BusinessClasses.csproj", "{55D08B96-7D85-4CD0-AE58-F46920D4BBA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvester", "Harvester\Harvester.csproj", "{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +23,22 @@ Global
 		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F542FAF4-114C-4E6A-9808-D05E98679B1A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56FB6E1C-2AF3-4B7A-B612-AC4E7DF5D2BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{906CF092-FA64-44B9-A4AF-4CFBB70F2DF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{906CF092-FA64-44B9-A4AF-4CFBB70F2DF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{906CF092-FA64-44B9-A4AF-4CFBB70F2DF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{906CF092-FA64-44B9-A4AF-4CFBB70F2DF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55D08B96-7D85-4CD0-AE58-F46920D4BBA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55D08B96-7D85-4CD0-AE58-F46920D4BBA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55D08B96-7D85-4CD0-AE58-F46920D4BBA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55D08B96-7D85-4CD0-AE58-F46920D4BBA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C8DA444-6E7F-45A3-BCDB-2C6934F9AE8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
