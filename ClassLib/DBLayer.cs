@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Text;
 using System.Web.UI.WebControls;
 using WeatherData;
-using System.Globalization;
 namespace DBLayer
 {
     public class WebhookPost
@@ -59,6 +58,23 @@ namespace DBLayer
             };
             return wt;
         }
+        public List<WeatherFromSQL> GetAnyYear(int year)
+        {
+
+            var list = new List<WeatherFromSQL>();
+            var z = new SqlCommand("select * from tempdatar where year = @year order by id desc", conn);
+            z.Parameters.AddWithValue("year", year);
+            conn.Open();
+            var reader = z.ExecuteReader();
+            while (reader.Read())
+            {
+                list.Add(CreateObjectFromSql(reader));
+            }
+            reader.Close();
+            conn.Close();
+            return list;
+
+        }
         public Details GetPropertiesOfWeather()
         {
             try
@@ -105,7 +121,7 @@ namespace DBLayer
         public List<MonthDataFormat> GetLast24Hours()
         {
             var list = new List<MonthDataFormat>();
-            var z = new SqlCommand("select top(24)* from tempdatar order by id desc", conn);
+            var z = new SqlCommand("select * from tempdatar where day=day(Cast(Getdate() as date))", conn);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())
@@ -145,7 +161,7 @@ namespace DBLayer
         {
             var list = new List<WeatherFromSQL>();
             var z = new SqlCommand("select * from tempdatar where year=@year order by id desc", conn);
-            z.Parameters.AddWithValue("year",yr);
+            z.Parameters.AddWithValue("year", yr);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())
@@ -156,7 +172,7 @@ namespace DBLayer
             conn.Close();
             return list;
         }
-        
+
         public List<WeatherFromSQL> GetAnyMonth(int month)
         {
             var list = new List<WeatherFromSQL>();
@@ -178,13 +194,12 @@ namespace DBLayer
             var directions = new[] { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East" };
             return directions[index];
         }
-
-        public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
+        public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList Day, DropDownList Month, DropDownList Year)
         {
             var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            var selectedmonth = Array.IndexOf(months1, DropDownList1.SelectedItem.Text) + 1;
-            var selectedday = DropDownList2.SelectedItem.Text;
-            var selectedyear = DropDownList3.SelectedItem.Text;
+            var selectedmonth = Array.IndexOf(months1, Month.SelectedItem.Text) + 1;
+            var selectedday = Day.SelectedItem.Text;
+            var selectedyear = Year.SelectedItem.Text;
             var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month and day = @day", conn);
             cmd.Parameters.AddWithValue("month", selectedmonth);
             cmd.Parameters.AddWithValue("year", selectedyear);
@@ -199,10 +214,10 @@ namespace DBLayer
                 {
                     Hour = reader["Hour"] + ":00",
                     Temperature = reader["Temperature"] + "°C",
-                    WindSpeed = reader["WindSpeed"]+" m/s",
+                    WindSpeed = reader["WindSpeed"] + " m/s",
                     Precipitation = reader["Precipitation"] + " mm",
                     Humidity = reader["Humidity"] + "%",
-                    WindSpeedGust = reader["WindSpeedGust"]+" m/s",
+                    WindSpeedGust = reader["WindSpeedGust"] + " m/s",
                     WindDirection = AngleToDirection(angle),
                 };
                 list.Add(ws);

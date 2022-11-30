@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChartClasses.cs" />
     <Compile Include="YearData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MonthData.cs" />

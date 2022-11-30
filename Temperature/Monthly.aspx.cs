@@ -14,20 +14,20 @@ namespace Temperature
             if (!IsPostBack)
             {
                 var bs = new BL();
-                bs.IntializeDropDownsForMonth(DropDownList1, DropDownList3);
-                DropDownList1.SelectedIndex = 0;
-                var newmonth = bs.ConvertMonthNameToMonthNumber(DropDownList1.SelectedValue);
+                bs.IntializeDropDownsForMonth(MonthDrop, YearDrop);
+                MonthDrop.SelectedIndex = 0;
+                var newmonth = bs.ConvertMonthNameToMonthNumber(MonthDrop.SelectedValue);
                 var weatherlist = bs.GetAnyMonth(newmonth);
                 GridView2.DataSource = weatherlist;
                 GridView2.DataBind();
-                
+                bs.CreateChartMonth(ChartTemp, weatherlist);
 
             }
         }
         protected void ChangedDropDown(object sender, EventArgs e)
         {
             var bs = new BL();
-            var newmonth = bs.ConvertMonthNameToMonthNumber(DropDownList1.SelectedValue);
+            var newmonth = bs.ConvertMonthNameToMonthNumber(MonthDrop.SelectedValue);
             var weatherlist = bs.GetAnyMonth(newmonth);
             GridView2.DataSource = weatherlist;
             GridView2.DataBind();
@@ -44,13 +44,13 @@ namespace Temperature
 
         protected void Increment_Click(object sender, EventArgs e)
         {
-            if (DropDownList1.SelectedIndex < 12)
+            if (MonthDrop.SelectedIndex < 12)
             {
                 try
                 {
                     var bs = new BL();
-                    DropDownList1.SelectedIndex++;
-                    var newmonth = bs.ConvertMonthNameToMonthNumber(DropDownList1.SelectedValue);
+                    MonthDrop.SelectedIndex++;
+                    var newmonth = bs.ConvertMonthNameToMonthNumber(MonthDrop.SelectedValue);
                     var weatherlist = bs.GetAnyMonth(newmonth);
                     GridView2.DataSource = weatherlist;
                     GridView2.DataBind();
@@ -63,11 +63,11 @@ namespace Temperature
 
         protected void Descend_Click(object sender, EventArgs e)
         {
-            if (DropDownList1.SelectedIndex >= 1)
+            if (MonthDrop.SelectedIndex >= 1)
             {
                 var bs = new BL();
-                DropDownList1.SelectedIndex--;
-                var newmonth = bs.ConvertMonthNameToMonthNumber(DropDownList1.SelectedValue);
+                MonthDrop.SelectedIndex--;
+                var newmonth = bs.ConvertMonthNameToMonthNumber(MonthDrop.SelectedValue);
                 var weatherlist = bs.GetAnyMonth(newmonth);
                 GridView2.DataSource = weatherlist;
                 GridView2.DataBind();

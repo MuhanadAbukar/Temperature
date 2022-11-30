@@ -16,35 +16,38 @@ namespace Temperature
             if (!IsPostBack)
             {
                 var bs = new BL();
-                bs.IntializeDropDowns(DropDownList1, DropDownList2, DropDownList3);
-                DropDownList2.SelectedIndex = 30;
-                var weatherlist = bs.UpdateGridViewOnDropDown(DropDownList1, DropDownList2, DropDownList3);
+                bs.IntializeDropDowns(DayDrop, MonthDrop, YearDrop);
+                var diff = (DateTime.Now.Day - 31)*-1;
+                DayDrop.SelectedIndex = diff;
+                var weatherlist = bs.UpdateGridViewOnDropDown(DayDrop, MonthDrop, YearDrop);
                 GridView2.DataSource = weatherlist;
                 GridView2.DataBind();
                 if (weatherlist.Count > 0)
                 {
-                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour);
+                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour,ChartTemp);
+                    bs.CreateChartDay(ChartTemp, weatherlist);
                 }
                 else
                 {
-                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour);
+                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour, ChartTemp);
                 }
-
             }
         }
         protected void ChangedDropDown(object sender, EventArgs e)
         {
             var bs = new BL();
-            var weatherlist = bs.UpdateGridViewOnDropDown(DropDownList1, DropDownList2, DropDownList3);
+            var weatherlist = bs.UpdateGridViewOnDropDown(DayDrop, MonthDrop, YearDrop);
             GridView2.DataSource = weatherlist;
             GridView2.DataBind();
             if (weatherlist.Count > 0)
             {
-                bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour);
+                bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour, ChartTemp);
+                bs.CreateChartDay(ChartTemp, weatherlist);
+
             }
             else
             {
-                bs.DisableTexts(Min, Max, Average, MaxHour, MinHour);
+                bs.DisableTexts(Min, Max, Average, MaxHour, MinHour, ChartTemp); ;
             }
         }
         protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
@@ -59,21 +62,23 @@ namespace Temperature
         protected void Increment_Click(object sender, EventArgs e)
         {
 
-            if (DropDownList2.SelectedIndex < 30 )
+            if (DayDrop.SelectedIndex < 30)
             {
                 var bs = new BL();
-                DropDownList2.SelectedIndex++;
-                var weatherlist = bs.UpdateGridViewOnDropDown(DropDownList1, DropDownList2, DropDownList3);
+                DayDrop.SelectedIndex++;
+                var weatherlist = bs.UpdateGridViewOnDropDown(DayDrop, MonthDrop, YearDrop);
                 GridView2.DataSource = weatherlist;
                 GridView2.DataBind();
-                Min.Text = DropDownList2.SelectedIndex.ToString();
+                Min.Text = DayDrop.SelectedIndex.ToString();
                 if (weatherlist.Count > 0)
                 {
-                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour);
+                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour, ChartTemp);
+                    bs.CreateChartDay(ChartTemp, weatherlist);
+
                 }
                 else
                 {
-                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour);
+                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour, ChartTemp);
                 }
             }
 
@@ -81,20 +86,22 @@ namespace Temperature
 
         protected void Descend_Click(object sender, EventArgs e)
         {
-            if (DropDownList2.SelectedIndex > 1)
+            if (DayDrop.SelectedIndex > 1)
             {
                 var bs = new BL();
-                DropDownList2.SelectedIndex--;
-                var weatherlist = bs.UpdateGridViewOnDropDown(DropDownList1, DropDownList2, DropDownList3);
+                DayDrop.SelectedIndex--;
+                var weatherlist = bs.UpdateGridViewOnDropDown(DayDrop, MonthDrop, YearDrop);
                 GridView2.DataSource = weatherlist;
                 GridView2.DataBind();
                 if (weatherlist.Count > 0)
                 {
-                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour);
+                    bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour, ChartTemp);
+                    bs.CreateChartDay(ChartTemp, weatherlist);
                 }
                 else
                 {
-                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour);
+                    bs.DisableTexts(Min, Max, Average, MaxHour, MinHour, ChartTemp);
+
                 }
             }
         }

@@ -60,31 +60,31 @@ namespace Temperature
         protected global::System.Web.UI.WebControls.Button Year;
 
         /// <summary>
-        /// DropDownList2 control.
+        /// DayDrop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DropDownList2;
+        protected global::System.Web.UI.WebControls.DropDownList DayDrop;
 
         /// <summary>
-        /// DropDownList1 control.
+        /// MonthDrop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DropDownList1;
+        protected global::System.Web.UI.WebControls.DropDownList MonthDrop;
 
         /// <summary>
-        /// DropDownList3 control.
+        /// YearDrop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DropDownList3;
+        protected global::System.Web.UI.WebControls.DropDownList YearDrop;
 
         /// <summary>
         /// Increment control.
@@ -157,5 +157,14 @@ namespace Temperature
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label Average;
+
+        /// <summary>
+        /// ChartTemp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.DataVisualization.Charting.Chart ChartTemp;
     }
 }

@@ -6,6 +6,8 @@ using System.Data;
 using System.Linq;
 using System.Web.UI.WebControls;
 using WeatherData;
+using System.Web.UI.DataVisualization.Charting;
+using System.Drawing;
 
 namespace BusinessLayer
 {
@@ -26,13 +28,13 @@ namespace BusinessLayer
             int z = 0;
             foreach (DataRow dr in months.Rows)
             {
-                DropDownList1.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
+                DropDownList2.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
                 z++;
 
             }
             for (int i = 1; i <= 31; i++)
             {
-                DropDownList2.Items.Insert(0, new ListItem(i.ToString(), i.ToString()));
+                DropDownList1.Items.Insert(0, new ListItem(i.ToString(), i.ToString()));
             }
             var years = dbl.GetValidYears();
             z = 0;
@@ -40,6 +42,17 @@ namespace BusinessLayer
             {
                 DropDownList3.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
                 z++;
+            }
+        }
+        public void IntializeDropDownsForYear(DropDownList Year)
+        {
+            var years = dbl.GetValidYears();
+            int i = 0;
+            foreach (DataRow dr in years.Rows)
+            {
+                var content = dr[0].ToString();
+                Year.Items.Insert(i, new ListItem(content, content));
+                i++;
             }
         }
         public void IntializeDropDownsForMonth(DropDownList Month, DropDownList Year)
@@ -62,7 +75,38 @@ namespace BusinessLayer
                 z++;
             }
         }
-        
+        public List<YData> GetYear(int year)
+        {
+            var lastyear = dbl.GetAnyYear(year);
+            var list = new List<YData>();
+
+            foreach (WeatherFromSQL Data in lastyear)
+            {
+                var thismonth = lastyear.Where(x => x.Month == Data.Month);
+                if (list.Where(x => MonthNameToMonthNum(x.Month) == Data.Month).Count() == 0)
+                {
+
+                    var max = thismonth.Max(x => x.Temperature);
+                    var min = thismonth.Min(x => x.Temperature);
+                    var minday = int.Parse(thismonth.Where(x => x.Temperature == min).Select(x => x.Day).ToList()[0].ToString());
+                    var maxday = int.Parse(thismonth.Where(x => x.Temperature == max).Select(x => x.Day).ToList()[0].ToString());
+                    var avg = thismonth.Average(x => x.Temperature);
+                    var mdata = new YData
+                    {
+                        Month = MonthNumToMonthName(Data.Month),
+                        Max = max + "°C",
+                        Min = min + "°C",
+                        AverageOfMonth = Math.Round(avg, 2) + "°C",
+                        MaxDay = maxday + "",
+                        MinDay = minday + ""
+                    };
+                    list.Add(mdata);
+                }
+            }
+            return list;
+        }
+
+
         public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
         {
             var db = new DBL();
@@ -72,6 +116,89 @@ namespace BusinessLayer
         {
             
             return dbl.GetLast24Hours();
+        }
+        public void CreateChartDay(Chart ChartTemp, List<MonthDataFormat> weatherlist)
+        {
+            var list = new List<ChartDay>();
+            foreach (var weather in weatherlist)
+            {
+                var cr = new ChartDay
+                {
+                    Hour = int.Parse(weather.Hour.Replace(":00", "")),
+                    Temperature = double.Parse(weather.Temperature.Replace("°C", ""))
+                };
+                list.Add(cr);
+            }
+            ChartTemp.Series.Clear();
+            ChartTemp.DataBindTable(list, "Hour");
+            ChartTemp.Series[0].ChartType = SeriesChartType.Line;
+            var pointCounter = 0;
+            ChartTemp.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+            ChartTemp.Series[0].LegendText = "Temperature";
+            foreach (DataPoint p in ChartTemp.Series[0].Points)
+            {
+                ChartTemp.Series[0].Points[pointCounter].ToolTip = p.YValues[0].ToString() + " - " + p.XValue.ToString();
+                ChartTemp.Series[0].Points[pointCounter].Label = p.YValues[0] + "°C";
+                ChartTemp.Series[0].Points[pointCounter].Color = Color.FromArgb(56, 80, 93);//page blue
+                pointCounter++;
+            }
+        }
+        public void CreateChartMonth(Chart ChartTemp, List<MData> weatherlist)
+        {
+            var list = new List<ChartMonth>();
+            foreach (var weather in weatherlist)
+            {
+                var cr = new ChartMonth
+                {
+                    Day = weather.Day,
+                    Temperature = double.Parse(weather.Average.Replace("°C", ""))
+                };
+                list.Add(cr);
+            }
+            ChartTemp.Series.Clear();
+            ChartTemp.DataBindTable(list, "Day");
+            ChartTemp.Series[0].ChartType = SeriesChartType.Line;
+            var pointCounter = 0;
+            ChartTemp.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+            ChartTemp.Series[0].LegendText = "Temperature";
+            foreach (DataPoint p in ChartTemp.Series[0].Points)
+            {
+                var label = ChartTemp.Series[0].Label;
+                
+                ChartTemp.Series[0].Points[pointCounter].ToolTip = p.YValues[0].ToString() + " - " + p.XValue.ToString();
+                ChartTemp.Series[0].Points[pointCounter].Label = p.YValues[0]+ "°C";
+                ChartTemp.Series[0].Points[pointCounter].Color = Color.FromArgb(56, 80, 93);//page blue
+                pointCounter++;
+            }
+        }
+        public void CreateChartYear(Chart ChartTemp, List<YData> weatherlist)
+        {
+            
+            var list = new List<ChartYear>();
+            foreach (var weather in weatherlist)
+            {
+                var cr = new ChartYear
+                {
+                    Month = ConvertMonthNameToMonthNumber(weather.Month),
+                    Temperature = double.Parse(weather.AverageOfMonth.Replace("°C", ""))
+                };
+                list.Add(cr);
+            }
+            ChartTemp.Series.Clear();
+            ChartTemp.DataBindTable(list, "Month");
+            ChartTemp.Series[0].ChartType = SeriesChartType.Line;
+            var pointCounter = 0;
+            ChartTemp.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+            ChartTemp.Series[0].LegendText = "Temperature";
+            foreach (DataPoint p in ChartTemp.Series[0].Points)
+            {
+                var label = ChartTemp.Series[0].Label;
+
+                ChartTemp.Series[0].Points[pointCounter].ToolTip = p.YValues[0].ToString() + " - " + p.XValue.ToString();
+                ChartTemp.Series[0].Points[pointCounter].Label = p.YValues[0] + "°C";
+                ChartTemp.Series[0].Points[pointCounter].Color = Color.FromArgb(56, 80, 93);//page blue
+                pointCounter++;
+            }
         }
         public List<MData> GetLastMonth()
         {
@@ -175,8 +302,9 @@ namespace BusinessLayer
 
             return list;
         }
-        public void EnableTexts(List<MonthDataFormat> weatherlist, Label Min, Label Max, Label Average, Label MaxHour, Label MinHour)
+        public void EnableTexts(List<MonthDataFormat> weatherlist, Label Min, Label Max, Label Average, Label MaxHour, Label MinHour, Chart ChartTemp)
         {
+            ChartTemp.Visible = true;
             Min.Visible = true;
             Max.Visible = true;
             Average.Visible = true;
@@ -215,7 +343,7 @@ namespace BusinessLayer
         }
         
 
-        public void DisableTexts(Label Min, Label Max, Label Average, Label MaxHour, Label MinHour)
+        public void DisableTexts(Label Min, Label Max, Label Average, Label MaxHour, Label MinHour, Chart chart)
         {
 
             Min.Visible = false;
@@ -223,6 +351,7 @@ namespace BusinessLayer
             Average.Visible = false;
             MinHour.Visible = false;
             MaxHour.Visible = false;
+            chart.Visible = false;
         }
         public List<WeatherFromSQL> UpdateGridViewOnDropDownMonth(DropDownList Month, DropDownList Year)
         {

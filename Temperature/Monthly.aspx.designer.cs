@@ -51,22 +51,22 @@ namespace Temperature
         protected global::System.Web.UI.WebControls.Button Year;
 
         /// <summary>
-        /// DropDownList1 control.
+        /// MonthDrop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DropDownList1;
+        protected global::System.Web.UI.WebControls.DropDownList MonthDrop;
 
         /// <summary>
-        /// DropDownList3 control.
+        /// YearDrop control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList DropDownList3;
+        protected global::System.Web.UI.WebControls.DropDownList YearDrop;
 
         /// <summary>
         /// Increment control.
@@ -96,42 +96,6 @@ namespace Temperature
         protected global::System.Web.UI.WebControls.GridView GridView2;
 
         /// <summary>
-        /// Max control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Max;
-
-        /// <summary>
-        /// MaxHour control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label MaxHour;
-
-        /// <summary>
-        /// Min control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Min;
-
-        /// <summary>
-        /// MinHour control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label MinHour;
-
-        /// <summary>
         /// Average control.
         /// </summary>
         /// <remarks>
@@ -139,5 +103,14 @@ namespace Temperature
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label Average;
+
+        /// <summary>
+        /// ChartTemp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.DataVisualization.Charting.Chart ChartTemp;
     }
 }

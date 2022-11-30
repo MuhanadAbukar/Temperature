@@ -14,9 +14,9 @@
             <asp:Button ID="Month" runat="server" Text="Monthly Data" OnClick="Month_Click" />
             <asp:Button ID="Year" runat="server" Text="Yearly Data" OnClick="Month_Click" />
             <br />
-            <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
+            <asp:DropDownList ID="MonthDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
-            <asp:DropDownList ID="DropDownList3" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
+            <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
             <br />
             <asp:Button ID="Increment" runat="server" Text="<" OnClick="Increment_Click" />
@@ -52,17 +52,35 @@
                     </asp:BoundField>
                      </Columns>
             </asp:GridView>
-            <asp:Label ID="Max" runat="server" Text=""></asp:Label>
-            <br/>
-            <asp:Label ID="MaxHour" runat="server" Text=""></asp:Label>
-            <br />
-            <br />
-            <asp:Label ID="Min" runat="server" Text=""></asp:Label>
-            <br/>
-            <asp:Label ID="MinHour" runat="server" Text=""></asp:Label>
-            <br />
-            <br />
+            
             <asp:Label ID="Average" runat="server" Text=""></asp:Label>
+             <asp:chart id="ChartTemp" runat="server" 
+               ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
+               BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               EnableViewState="True">
+               <legends>
+                  <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>
+               </legends>
+               <borderskin skinstyle="None"></borderskin>
+               <series>
+                  <asp:series Name="Series1"  BorderColor="#38505d" Color="Black" 
+                     ChartType="Renko" YValuesPerPoint="4" ></asp:series>
+               </series>
+               <chartareas>
+                  <asp:chartarea  Name="ChartArea1" BorderColor="#38505d" BorderDashStyle="Solid" BackSecondaryColor="White" BackColor="white" ShadowColor="Transparent" BackGradientStyle="TopBottom">
+                     <area3dstyle Rotation="10" perspective="10" Inclination="15" IsRightAngleAxes="False" wallwidth="0" IsClustered="False"></area3dstyle>
+                     <axisy linecolor="#38505d" IsLabelAutoFit="False">
+                        <labelstyle font="Helvetica Neue, 8.25pt, style=Bold" ForeColor="#38505d" />
+                        <majorgrid linecolor="#38505d" />
+                     </axisy>
+                     <axisx linecolor="#38505d" IsLabelAutoFit="False">
+                        <labelstyle font="Helvetica Neue, 8.25pt, style=Bold" ForeColor="#38505d" />
+                        <majorgrid linecolor="#38505d" />
+                     </axisx>
+                  </asp:chartarea>
+               </chartareas>
+            </asp:chart>
          </div>
       </form>
    </body>

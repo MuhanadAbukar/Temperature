@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Web.Helpers;
 using System.Web.UI.WebControls;
 
 namespace Temperature
@@ -17,7 +18,8 @@ namespace Temperature
                 var weatherlist = bs.GetLast24Hours();
                 GridView1.DataSource = weatherlist;
                 GridView1.DataBind();
-                bs.EnableTexts(weatherlist,Min,Max,Average,MaxHour,MinHour);
+                bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour, ChartTemp);
+                bs.CreateChartDay(ChartTemp, weatherlist);
                 var currentTemp = weatherlist[weatherlist.Count-1].Temperature;
                 h1.InnerHtml = $"Current Temperature: {currentTemp}";
             }
