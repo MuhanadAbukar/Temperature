@@ -13,14 +13,14 @@
             <asp:Button ID="Monthly" runat="server" Text="Data from any month" OnClick="Month_Click" />
             <asp:Button ID="Year" runat="server" Text="Yearly Data" OnClick="Month_Click" />
             <br />
-            <asp:DropDownList ID="DayDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
+            <asp:DropDownList ID="DayDrop" runat="server" AutoPostBack="True">
             </asp:DropDownList>
             <asp:DropDownList ID="MonthDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
             <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
             <br />
-            <asp:Button ID="Increment" runat="server" Text="<" OnClick="Increment_Click" />
+            <asp:Button ID="Increment" runat="server" Text="<" OnClick="Increment_Click"/>
             <asp:Button ID="Descend" runat="server" Text=">" OnClick="Descend_Click" />
             <asp:GridView ID="GridView2" runat="server" BackColor="#CCCCCC" AutoGenerateColumns="false" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" ForeColor="Black">
                <FooterStyle BackColor="#CCCCCC" />

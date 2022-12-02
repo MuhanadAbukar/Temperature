@@ -1,10 +1,6 @@
 ﻿using BusinessLayer;
 using System;
-using System.Web.Helpers;
 using System.Web.UI.WebControls;
-using WeatherData;
-using System.Linq;
-using System.Collections.Generic;
 namespace Temperature
 {
     public partial class Year : System.Web.UI.Page
@@ -28,7 +24,7 @@ namespace Temperature
         }
         protected void Month_Click(object sender, EventArgs e)
         {
-            Response.Redirect( (((Button)sender).ID + ".aspx" ).Replace("1",""));
+            Response.Redirect((((Button)sender).ID + ".aspx").Replace("1", ""));
         }
         protected void UpdateGridAndChart()
         {

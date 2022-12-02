@@ -15,7 +15,7 @@ namespace Temperature
                 var weatherlist = bs.GetLastMonth();
                 GridView1.DataSource = weatherlist;
                 GridView1.DataBind();
-                bs.CreateChartMonth(ChartTemp,weatherlist);
+                bs.CreateChartMonth(ChartTemp, weatherlist);
 
                 //var max = weatherlist.Max(x => x.Max);
                 //var maxhour = weatherlist.Where(x => x.Temperature == max).Select(x => x.Hour).ToList();

@@ -75,8 +75,9 @@ namespace DBLayer
             return list;
 
         }
-        public Details GetPropertiesOfWeather()
+        public Data GetPropertiesOfWeather()
         {
+            
             try
             {
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create($"https://api.met.no/weatherapi/nowcast/2.0/complete?lat=59.218633&lon=10.942062");
@@ -85,21 +86,26 @@ namespace DBLayer
                 var streamReader = new StreamReader(httpResponse.GetResponseStream());
                 var result = streamReader.ReadToEnd();
                 var real = JsonConvert.DeserializeObject<WeatherData.WeatherData>(result);
-                var properties = real.properties.timeseries[0].data.instant.details;
+                var properties = real.properties.timeseries[0].data;
                 return properties;
             }
             catch (Exception m)
             {
                 var d = new WebhookPost();
                 d.PostWebhook(m.Message + " <@568374878500159490>");
-                var d2 = new Details
-                {
-                    air_temperature = 99999
-                };
-                return d2;
+                var dat = new Data();
+                return dat;
             }
         }
-
+        public DataTable GetValidDaysOfMonth(int month)
+        {
+            var cmd = new SqlCommand($"select distinct day from tempdatar where month = {month}", conn);
+            conn.Open();
+            var dt = new DataTable();
+            dt.Load(cmd.ExecuteReader());
+            conn.Close();
+            return dt;
+        }
         public DataTable GetValidMonths()
         {
             var cmd = new SqlCommand("select distinct Month from tempdatar order by month desc", conn);
@@ -243,7 +249,7 @@ namespace DBLayer
             conn.Close();
             return list;
         }
-        public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation, float humidity, float gust, float direction)
+        public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation, float humidity, float gust, float direction, string skycode)
         {
             conn.Open();
             var dt = DateTime.Now;
@@ -251,7 +257,7 @@ namespace DBLayer
             var mnth = dt.Month;
             var day = dt.Day;
             var hour = dt.Hour;
-            var cmd = new SqlCommand($"insert into TempDataR values({yr},{mnth},{day},{hour},{temp},{windspeed},{precipitation},{humidity},{gust}, {direction})", conn);
+            var cmd = new SqlCommand($"insert into TempDataR values({yr},{mnth},{day},{hour},{temp},{windspeed},{precipitation},{humidity},{gust}, {direction},'{skycode}')", conn);
             cmd.ExecuteNonQuery();
             conn.Close();
         }

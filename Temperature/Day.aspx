@@ -13,7 +13,7 @@
 <body>
     <form id="form1" runat="server">
         <div>
-            <h1>The Last 24 hours</h1>
+            <h1>Temperatures of today</h1>
             
             <asp:Button ID="Daily" runat="server" Text="Data from any day" OnClick="Month_Click" />
             <asp:Button ID="Month" runat="server" Text="Data from the last 30 days" OnClick="Month_Click" />

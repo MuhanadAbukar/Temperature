@@ -3,11 +3,11 @@ using SQLWeather;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
+using System.Web.UI.DataVisualization.Charting;
 using System.Web.UI.WebControls;
 using WeatherData;
-using System.Web.UI.DataVisualization.Charting;
-using System.Drawing;
 
 namespace BusinessLayer
 {
@@ -15,27 +15,39 @@ namespace BusinessLayer
     public class BL
     {
         DBL dbl = new DBL();
-        public int ConvertMonthNameToMonthNumber(string name)
-        {
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            return Array.IndexOf(months1, name) + 1;
-        }
+
         public void IntializeDropDowns(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
         {
-            
-            var months = dbl.GetValidMonths();
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
             int z = 0;
-            foreach (DataRow dr in months.Rows)
+            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+            if (DropDownList2.Items.Count == 0)
             {
-                DropDownList2.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
-                z++;
+                var months = dbl.GetValidMonths();
+                foreach (DataRow dr in months.Rows)
+                {
+                    DropDownList2.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
+                    z++;
 
+                }
             }
-            for (int i = 1; i <= 31; i++)
+            DropDownList3.Items.Clear();
+            var oldind = DropDownList1.SelectedIndex;
+            DropDownList1.Items.Clear();
+            var monthnum = MonthNameToMonthNum(DropDownList2.SelectedValue);
+            var monthname = MonthNumToMonthName(monthnum);
+            var month = Array.IndexOf(months1, monthname);
+            var days = dbl.GetValidDaysOfMonth(month + 1);
+            z = 0;
+            foreach (DataRow dr in days.Rows)
             {
-                DropDownList1.Items.Insert(0, new ListItem(i.ToString(), i.ToString()));
+                DropDownList1.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
+                z++;
             }
+            try
+            {
+                DropDownList1.SelectedIndex = oldind;
+            }
+            catch (ArgumentOutOfRangeException) { }
             var years = dbl.GetValidYears();
             z = 0;
             foreach (DataRow dr in years.Rows)
@@ -57,7 +69,7 @@ namespace BusinessLayer
         }
         public void IntializeDropDownsForMonth(DropDownList Month, DropDownList Year)
         {
-            
+            Month.SelectedIndex = 0;
             var months = dbl.GetValidMonths();
             var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
             int z = 0;
@@ -73,6 +85,31 @@ namespace BusinessLayer
             {
                 Year.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
                 z++;
+            }
+            Month.SelectedIndex = 0;
+        }
+        private string GetOrdinalNumber(int num, string month)
+        {
+            if (num <= 0) return num.ToString();
+
+            switch (num % 100)
+            {
+                case 11:
+                case 12:
+                case 13:
+                    return $"{num}th of {month}";
+            }
+
+            switch (num % 10)
+            {
+                case 1:
+                    return $"{num}st of {month}";
+                case 2:
+                    return $"{num}nd of {month}";
+                case 3:
+                    return $"{num}rd of {month}";
+                default:
+                    return $"{num}th of {month}";
             }
         }
         public List<YData> GetYear(int year)
@@ -97,8 +134,8 @@ namespace BusinessLayer
                         Max = max + "°C",
                         Min = min + "°C",
                         AverageOfMonth = Math.Round(avg, 2) + "°C",
-                        MaxDay = maxday + "",
-                        MinDay = minday + ""
+                        MaxDay = GetOrdinalNumber(maxday, MonthNumToMonthName(Data.Month)),
+                        MinDay = GetOrdinalNumber(minday, MonthNumToMonthName(Data.Month))
                     };
                     list.Add(mdata);
                 }
@@ -114,7 +151,7 @@ namespace BusinessLayer
         }
         public List<MonthDataFormat> GetLast24Hours()
         {
-            
+
             return dbl.GetLast24Hours();
         }
         public void CreateChartDay(Chart ChartTemp, List<MonthDataFormat> weatherlist)
@@ -129,6 +166,7 @@ namespace BusinessLayer
                 };
                 list.Add(cr);
             }
+            
             ChartTemp.Series.Clear();
             ChartTemp.DataBindTable(list, "Hour");
             ChartTemp.Series[0].ChartType = SeriesChartType.Line;
@@ -164,22 +202,22 @@ namespace BusinessLayer
             foreach (DataPoint p in ChartTemp.Series[0].Points)
             {
                 var label = ChartTemp.Series[0].Label;
-                
+
                 ChartTemp.Series[0].Points[pointCounter].ToolTip = p.YValues[0].ToString() + " - " + p.XValue.ToString();
-                ChartTemp.Series[0].Points[pointCounter].Label = p.YValues[0]+ "°C";
+                ChartTemp.Series[0].Points[pointCounter].Label = p.YValues[0] + "°C";
                 ChartTemp.Series[0].Points[pointCounter].Color = Color.FromArgb(56, 80, 93);//page blue
                 pointCounter++;
             }
         }
         public void CreateChartYear(Chart ChartTemp, List<YData> weatherlist)
         {
-            
+
             var list = new List<ChartYear>();
             foreach (var weather in weatherlist)
             {
                 var cr = new ChartYear
                 {
-                    Month = ConvertMonthNameToMonthNumber(weather.Month),
+                    Month = MonthNameToMonthNum(weather.Month),
                     Temperature = double.Parse(weather.AverageOfMonth.Replace("°C", ""))
                 };
                 list.Add(cr);
@@ -202,7 +240,7 @@ namespace BusinessLayer
         }
         public List<MData> GetLastMonth()
         {
-            
+
             var lastmonth = dbl.GetLastMonth();
             var list = new List<MData>();
             foreach (WeatherFromSQL Data in lastmonth)
@@ -218,11 +256,11 @@ namespace BusinessLayer
                     var mdata = new MData
                     {
                         Day = Data.Day,
-                        Max = max+ "°C",
+                        Max = max + "°C",
                         Min = min + "°C",
-                        Average = Math.Round(today.Average(x => x.Temperature), 2)+ "°C",
-                        MaxHour = maxhour+":00",
-                        MinHour = minhour+":00"
+                        Average = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
+                        MaxHour = maxhour + ":00",
+                        MinHour = minhour + ":00"
                     };
                     list.Add(mdata);
                 }
@@ -230,39 +268,39 @@ namespace BusinessLayer
 
             return list;
         }
-        private string MonthNumToMonthName(int num)
+        public string MonthNumToMonthName(int num)
         {
             var months = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
             return months[num - 1];
         }
-        private int MonthNameToMonthNum(string num)
+        public int MonthNameToMonthNum(string num)
         {
             var months = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            return Array.IndexOf(months,num)+1;
+            return Array.IndexOf(months, num) + 1;
         }
         public List<YData> GetLastYear()
         {
-            
+
             var lastyear = dbl.GetLastYear(DateTime.Now.Year);
             var list = new List<YData>();
-            
+
             foreach (WeatherFromSQL Data in lastyear)
             {
                 var thismonth = lastyear.Where(x => x.Month == Data.Month);
                 if (list.Where(x => MonthNameToMonthNum(x.Month) == Data.Month).Count() == 0)
                 {
-                    
+
                     var max = thismonth.Max(x => x.Temperature);
                     var min = thismonth.Min(x => x.Temperature);
-                    var minday = int.Parse(thismonth.Where(x=>x.Temperature == min).Select(x => x.Day).ToList()[0].ToString());
-                    var maxday = int.Parse(thismonth.Where(x=>x.Temperature == max).Select(x => x.Day).ToList()[0].ToString());
+                    var minday = int.Parse(thismonth.Where(x => x.Temperature == min).Select(x => x.Day).ToList()[0].ToString());
+                    var maxday = int.Parse(thismonth.Where(x => x.Temperature == max).Select(x => x.Day).ToList()[0].ToString());
                     var avg = thismonth.Average(x => x.Temperature);
                     var mdata = new YData
                     {
                         Month = MonthNumToMonthName(Data.Month),
                         Max = max + "°C",
                         Min = min + "°C",
-                        AverageOfMonth = Math.Round(avg, 2)+ "°C",
+                        AverageOfMonth = Math.Round(avg, 2) + "°C",
                         MaxDay = maxday + "",
                         MinDay = minday + ""
                     };
@@ -274,7 +312,7 @@ namespace BusinessLayer
         }
         public List<MData> GetAnyMonth(int month)
         {
-            
+
             var themonth = dbl.GetAnyMonth(month);
             var list = new List<MData>();
             foreach (WeatherFromSQL Data in themonth)
@@ -292,7 +330,7 @@ namespace BusinessLayer
                         Day = Data.Day,
                         Max = max + "°C",
                         Min = min + "°C",
-                        Average = Math.Round(today.Average(x => x.Temperature), 2)+ "°C",
+                        Average = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
                         MaxHour = maxhour + ":00",
                         MinHour = minhour + ":00"
                     };
@@ -310,7 +348,7 @@ namespace BusinessLayer
             Average.Visible = true;
             MaxHour.Visible = true;
             MinHour.Visible = true;
-            var intList = weatherlist.Select(x => double.Parse(x.Temperature.Replace("°C",""))).ToList();
+            var intList = weatherlist.Select(x => double.Parse(x.Temperature.Replace("°C", ""))).ToList();
             var max = intList.Max();
             var min = intList.Min();
             var maxhour = weatherlist.Where(x => double.Parse(x.Temperature.Replace("°C", "")) == max).Select(x => x.Hour).ToList()[0];
@@ -330,8 +368,8 @@ namespace BusinessLayer
             Average.Visible = true;
             var max = weatherlist.Max(x => x.Temperature);
             var min = weatherlist.Min(x => x.Temperature);
-            var maxday = string.Join(" ",weatherlist.Where(x => x.Temperature == max).Select(x => x.Day).ToList());
-            var minday = string.Join(" ",weatherlist.Where(x => x.Temperature == min).Select(x => x.Day).ToList());
+            var maxday = string.Join(" ", weatherlist.Where(x => x.Temperature == max).Select(x => x.Day).ToList());
+            var minday = string.Join(" ", weatherlist.Where(x => x.Temperature == min).Select(x => x.Day).ToList());
             var maxhour = string.Join(" ", weatherlist.Where(x => x.Temperature == max).Select(x => x.Hour).ToList());
             var minhour = string.Join(" ", weatherlist.Where(x => x.Temperature == min).Select(x => x.Hour).ToList());
             var avg = Math.Round(weatherlist.Average(x => x.Temperature), 2);
@@ -341,7 +379,7 @@ namespace BusinessLayer
             MinHour.Text = $"Day of the lowest temperature: {minday}, Hour: {minhour}:00";
             Average.Text = $"Average Temperature: {avg}°C";
         }
-        
+
 
         public void DisableTexts(Label Min, Label Max, Label Average, Label MaxHour, Label MinHour, Chart chart)
         {
@@ -355,7 +393,7 @@ namespace BusinessLayer
         }
         public List<WeatherFromSQL> UpdateGridViewOnDropDownMonth(DropDownList Month, DropDownList Year)
         {
-            
+
             return dbl.UpdateGridViewOnDropDownMonth(Month, Year);
         }
     }
