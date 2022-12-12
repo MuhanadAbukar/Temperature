@@ -88,6 +88,13 @@
   <ItemGroup>
     <Content Include="Daily.aspx" />
     <Content Include="Day.aspx" />
+    <Content Include="images\clearsky_day.png" />
+    <Content Include="images\clearsky_night.png" />
+    <Content Include="images\cloudy.png" />
+    <Content Include="images\fair_day.png" />
+    <Content Include="images\fair_night.png" />
+    <Content Include="images\partlycloudy_day.png" />
+    <Content Include="images\partlycloudy_night.png" />
     <Content Include="Month.aspx" />
     <Content Include="Monthly.aspx" />
     <Content Include="Web.config" />
@@ -154,6 +161,7 @@
       <Name>DBLayer</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

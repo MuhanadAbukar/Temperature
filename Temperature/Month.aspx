@@ -31,9 +31,11 @@
                     <asp:BoundField DataField="MinHour" HeaderText="Time of the lowest temperature" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
-                    <asp:BoundField DataField="Average" HeaderText="Average Temperature of the day" ItemStyle-Width="150" >
+                    <asp:BoundField DataField="AverageTemp" HeaderText="Average Temperature of the day" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
+                    <asp:ImageField DataImageUrlField="AverageSky" HeaderText="Average Sky">
+                </asp:ImageField>
                 </Columns>
                 <FooterStyle BackColor="#CCCCCC" />
                 <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
@@ -52,7 +54,7 @@
             <asp:chart id="ChartTemp" runat="server" 
                ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
                BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
-               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="364px" Width="1177px" 
                EnableViewState="True">
                <legends>
                   <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>

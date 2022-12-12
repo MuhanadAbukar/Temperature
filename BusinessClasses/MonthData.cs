@@ -7,6 +7,8 @@
         public string MaxHour { get; set; }
         public string Min { get; set; }
         public string MinHour { get; set; }
-        public string Average { get; set; }
+        public string AverageTemp { get; set; }
+        public string AverageSky { get; set; }
+
     }
 }

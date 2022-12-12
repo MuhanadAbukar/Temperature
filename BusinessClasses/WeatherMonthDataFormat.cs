@@ -9,5 +9,6 @@
         public string Humidity { get; set; }
         public string WindSpeedGust { get; set; }
         public string WindDirection { get; set; }
+        public string image { get; set; }
     }
 }

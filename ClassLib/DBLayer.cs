@@ -8,7 +8,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Web.UI.WebControls;
 using WeatherData;
 namespace DBLayer
 {
@@ -54,7 +53,8 @@ namespace DBLayer
                 Precipitation = (double)reader["Precipitation"],
                 Humidity = (double)reader["Humidity"],
                 WindSpeedGust = (double)reader["WindSpeedGust"],
-                WindDirection = (double)reader["WindDirection"]
+                WindDirection = (double)reader["WindDirection"],
+                Sky = reader["Sky"].ToString()
             };
             return wt;
         }
@@ -77,9 +77,11 @@ namespace DBLayer
         }
         public Data GetPropertiesOfWeather()
         {
-            
+
             try
-            {
+            {//69.649570, 18.956684
+
+
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create($"https://api.met.no/weatherapi/nowcast/2.0/complete?lat=59.218633&lon=10.942062");
                 httpWebRequest.UserAgent = "Muhanad";
                 var httpResponse = httpWebRequest.GetResponse();
@@ -99,7 +101,7 @@ namespace DBLayer
         }
         public DataTable GetValidDaysOfMonth(int month)
         {
-            var cmd = new SqlCommand($"select distinct day from tempdatar where month = {month}", conn);
+            var cmd = new SqlCommand($"select distinct day from tempdatar where month = {month} order by day", conn);
             conn.Open();
             var dt = new DataTable();
             dt.Load(cmd.ExecuteReader());
@@ -124,10 +126,16 @@ namespace DBLayer
             conn.Close();
             return dt;
         }
+        private string AngleToDirection(double angle)
+        {
+            var index = int.Parse((Math.Round(((angle %= 360) < 0 ? angle + 360 : angle) / 45) % 8).ToString());
+            var directions = new[] { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East" };
+            return directions[index];
+        }
         public List<MonthDataFormat> GetLast24Hours()
         {
             var list = new List<MonthDataFormat>();
-            var z = new SqlCommand("select * from tempdatar where day=day(Cast(Getdate() as date))", conn);
+            var z = new SqlCommand("select * from tempdatar where day=day(Cast(Getdate() as date)) and month = month(Cast(Getdate() as date)) and year = year(Cast(Getdate() as date))", conn);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())
@@ -142,6 +150,7 @@ namespace DBLayer
                     Humidity = reader["Humidity"] + "%",
                     WindSpeedGust = reader["WindSpeedGust"] + " m/s",
                     WindDirection = AngleToDirection(angle),
+                    image = $@"~\images\{reader["Sky"]}.png"
                 };
                 list.Add(ws);
             }
@@ -152,7 +161,7 @@ namespace DBLayer
         public List<WeatherFromSQL> GetLastMonth()
         {
             var list = new List<WeatherFromSQL>();
-            var z = new SqlCommand("select * from tempdatar order by id desc", conn);
+            var z = new SqlCommand("select * from tempdatar where month = month(Cast(Getdate() as date)) and year = year(Cast(Getdate() as date))", conn);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())
@@ -194,61 +203,9 @@ namespace DBLayer
             conn.Close();
             return list;
         }
-        private string AngleToDirection(double angle)
-        {
-            var index = int.Parse((Math.Round(((angle %= 360) < 0 ? angle + 360 : angle) / 45) % 8).ToString());
-            var directions = new[] { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East" };
-            return directions[index];
-        }
-        public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList Day, DropDownList Month, DropDownList Year)
-        {
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            var selectedmonth = Array.IndexOf(months1, Month.SelectedItem.Text) + 1;
-            var selectedday = Day.SelectedItem.Text;
-            var selectedyear = Year.SelectedItem.Text;
-            var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month and day = @day", conn);
-            cmd.Parameters.AddWithValue("month", selectedmonth);
-            cmd.Parameters.AddWithValue("year", selectedyear);
-            cmd.Parameters.AddWithValue("day", selectedday);
-            conn.Open();
-            var list = new List<MonthDataFormat>();
-            var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                var angle = double.Parse(reader["WindDirection"].ToString());
-                var ws = new MonthDataFormat
-                {
-                    Hour = reader["Hour"] + ":00",
-                    Temperature = reader["Temperature"] + "°C",
-                    WindSpeed = reader["WindSpeed"] + " m/s",
-                    Precipitation = reader["Precipitation"] + " mm",
-                    Humidity = reader["Humidity"] + "%",
-                    WindSpeedGust = reader["WindSpeedGust"] + " m/s",
-                    WindDirection = AngleToDirection(angle),
-                };
-                list.Add(ws);
-            }
-            conn.Close();
-            return list;
-        }
-        public List<WeatherFromSQL> UpdateGridViewOnDropDownMonth(DropDownList Month, DropDownList Year)
-        {
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            var selectedmonth = Array.IndexOf(months1, Month.SelectedItem.Text) + 1;
-            var selectedyear = Year.SelectedItem.Text;
-            var cmd = new SqlCommand($"select Year,Month,Day,Hour,Temperature,Windspeed,Precipitation,Humidity,Windspeedgust,Winddirection from tempdatar where year = @year and month = @month", conn);
-            cmd.Parameters.AddWithValue("month", selectedmonth);
-            cmd.Parameters.AddWithValue("year", selectedyear);
-            conn.Open();
-            var list = new List<WeatherFromSQL>();
-            var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                list.Add(CreateObjectFromSql(reader));
-            }
-            conn.Close();
-            return list;
-        }
+
+
+
         public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation, float humidity, float gust, float direction, string skycode)
         {
             conn.Open();

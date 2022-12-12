@@ -15,7 +15,10 @@ namespace BusinessLayer
     public class BL
     {
         DBL dbl = new DBL();
-
+        public string GetTheMostCommonSkyCode(List<MonthDataFormat> weatherlist)
+        {
+            return weatherlist.GroupBy(a => a.image).OrderByDescending(g => g.Count()).First().Key;
+        }
         public void IntializeDropDowns(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
         {
             int z = 0;
@@ -128,14 +131,18 @@ namespace BusinessLayer
                     var minday = int.Parse(thismonth.Where(x => x.Temperature == min).Select(x => x.Day).ToList()[0].ToString());
                     var maxday = int.Parse(thismonth.Where(x => x.Temperature == max).Select(x => x.Day).ToList()[0].ToString());
                     var avg = thismonth.Average(x => x.Temperature);
+                    var avgSky = thismonth.GroupBy(a => a.Sky).OrderByDescending(g => g.Count()).First().Key;
+                    if (avgSky == "")
+                        avgSky = "errors";
                     var mdata = new YData
                     {
                         Month = MonthNumToMonthName(Data.Month),
                         Max = max + "°C",
                         Min = min + "°C",
-                        AverageOfMonth = Math.Round(avg, 2) + "°C",
+                        AverageTempOfMonth = Math.Round(avg, 2) + "°C",
                         MaxDay = GetOrdinalNumber(maxday, MonthNumToMonthName(Data.Month)),
-                        MinDay = GetOrdinalNumber(minday, MonthNumToMonthName(Data.Month))
+                        MinDay = GetOrdinalNumber(minday, MonthNumToMonthName(Data.Month)),
+                        AverageSkyOfMonth = $@"~\images\{avgSky}.png"
                     };
                     list.Add(mdata);
                 }
@@ -143,12 +150,107 @@ namespace BusinessLayer
             return list;
         }
 
-
-        public List<MonthDataFormat> UpdateGridViewOnDropDown(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
+        public List<WeatherFromSQL> GetAnyYear(int year)
         {
-            var db = new DBL();
-            return db.UpdateGridViewOnDropDown(DropDownList1, DropDownList2, DropDownList3);
+            return dbl.GetAnyYear(year);
         }
+        private string AngleToDirection(double angle)
+        {
+            var index = int.Parse((Math.Round(((angle %= 360) < 0 ? angle + 360 : angle) / 45) % 8).ToString());
+            var directions = new[] { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East" };
+            return directions[index];
+        }
+        public List<MonthDataFormat> ParseWeatherDataToDayReport(List<WeatherFromSQL> weatherFromSQLs)
+        {
+            var list = new List<MonthDataFormat>();
+            foreach (WeatherFromSQL weatherFromSQL in weatherFromSQLs)
+            {
+                var angle = double.Parse(weatherFromSQL.WindDirection.ToString());
+                var nullweather = weatherFromSQL.Sky;
+                var ws = new MonthDataFormat();
+                if (nullweather == "")
+                {
+                    ws = new MonthDataFormat
+                    {
+                        Hour = weatherFromSQL.Hour + ":00",
+                        Temperature = weatherFromSQL.Temperature + "°C",
+                        WindSpeed = weatherFromSQL.WindSpeed + " m/s",
+                        Precipitation = weatherFromSQL.Precipitation + " mm",
+                        Humidity = weatherFromSQL.Humidity + "%",
+                        WindSpeedGust = weatherFromSQL.WindSpeedGust + " m/s",
+                        WindDirection = AngleToDirection(angle),
+                        image = $@"~\images\errors1.png"
+                    };
+                }
+                else
+                {
+                    ws = new MonthDataFormat
+                    {
+                        Hour = weatherFromSQL.Hour + ":00",
+                        Temperature = weatherFromSQL.Temperature + "°C",
+                        WindSpeed = weatherFromSQL.WindSpeed + " m/s",
+                        Precipitation = weatherFromSQL.Precipitation + " mm",
+                        Humidity = weatherFromSQL.Humidity + "%",
+                        WindSpeedGust = weatherFromSQL.WindSpeedGust + " m/s",
+                        WindDirection = AngleToDirection(angle),
+                        image = $@"~\images\{weatherFromSQL.Sky}.png"
+                    };
+                }
+                list.Add(ws);
+            }
+
+            return list;
+        }
+        public List<MData> ParseWeatherDataToMonthReport(List<WeatherFromSQL> weatherFromSQLs)
+        {
+            var list = new List<MData>();
+            var themonth = weatherFromSQLs;
+            foreach (WeatherFromSQL Data in themonth)
+            {
+
+                var today = themonth.Where(x => x.Day == Data.Day);
+                if (list.Where(x => x.Day == Data.Day).Count() == 0)
+                {
+                    var max = today.Max(x => x.Temperature);
+                    var min = today.Where(x => x.Day == Data.Day).Min(x => x.Temperature);
+                    var minhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == min).Select(x => x.Hour).ToList()[0].ToString());
+                    var maxhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == max).Select(x => x.Hour).ToList()[0].ToString());
+                    var avgSky = today.GroupBy(a => a.Sky).OrderByDescending(g => g.Count()).First().Key;
+                    var mdata = new MData();
+                    if (avgSky == "")
+                    {
+                        mdata = new MData
+                        {
+                            Day = Data.Day,
+                            Max = max + "°C",
+                            Min = min + "°C",
+                            AverageTemp = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
+                            MaxHour = maxhour + ":00",
+                            MinHour = minhour + ":00",
+                            AverageSky = $@"~\images\errors1.png"
+                        };
+                    }
+                    else
+                    {
+                        mdata = new MData
+                        {
+                            Day = Data.Day,
+                            Max = max + "°C",
+                            Min = min + "°C",
+                            AverageTemp = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
+                            MaxHour = maxhour + ":00",
+                            MinHour = minhour + ":00",
+                            AverageSky = $@"~\images\{avgSky}.png"
+                        };
+                    }
+
+                    list.Add(mdata);
+                }
+            }
+
+            return list;
+        }
+
         public List<MonthDataFormat> GetLast24Hours()
         {
 
@@ -166,7 +268,7 @@ namespace BusinessLayer
                 };
                 list.Add(cr);
             }
-            
+
             ChartTemp.Series.Clear();
             ChartTemp.DataBindTable(list, "Hour");
             ChartTemp.Series[0].ChartType = SeriesChartType.Line;
@@ -189,7 +291,7 @@ namespace BusinessLayer
                 var cr = new ChartMonth
                 {
                     Day = weather.Day,
-                    Temperature = double.Parse(weather.Average.Replace("°C", ""))
+                    Temperature = double.Parse(weather.AverageTemp.Replace("°C", ""))
                 };
                 list.Add(cr);
             }
@@ -218,7 +320,7 @@ namespace BusinessLayer
                 var cr = new ChartYear
                 {
                     Month = MonthNameToMonthNum(weather.Month),
-                    Temperature = double.Parse(weather.AverageOfMonth.Replace("°C", ""))
+                    Temperature = double.Parse(weather.AverageTempOfMonth.Replace("°C", ""))
                 };
                 list.Add(cr);
             }
@@ -253,15 +355,36 @@ namespace BusinessLayer
                     var min = today.Where(x => x.Day == Data.Day).Min(x => x.Temperature);
                     var minhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == min).Select(x => x.Hour).ToList()[0].ToString());
                     var maxhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == max).Select(x => x.Hour).ToList()[0].ToString());
-                    var mdata = new MData
+                    var avgsky = today.GroupBy(a => a.Sky).OrderByDescending(g => g.Count()).First().Key;
+                    var avgtemp = Math.Round(today.Average(x => x.Temperature), 2);
+                    var mdata = new MData();
+                    if (avgsky == "")
                     {
-                        Day = Data.Day,
-                        Max = max + "°C",
-                        Min = min + "°C",
-                        Average = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
-                        MaxHour = maxhour + ":00",
-                        MinHour = minhour + ":00"
-                    };
+                        mdata = new MData
+                        {
+                            Day = Data.Day,
+                            Max = max + "°C",
+                            Min = min + "°C",
+                            AverageTemp = avgtemp + "°C",
+                            MaxHour = maxhour + ":00",
+                            MinHour = minhour + ":00",
+                            AverageSky = $@"~\images\errors1.png"
+                        };
+                    }
+                    else
+                    {
+                        mdata = new MData
+                        {
+                            Day = Data.Day,
+                            Max = max + "°C",
+                            Min = min + "°C",
+                            AverageTemp = avgtemp + "°C",
+                            MaxHour = maxhour + ":00",
+                            MinHour = minhour + ":00",
+                            AverageSky = $@"~\images\{avgsky}.png"
+                        };
+                    }
+
                     list.Add(mdata);
                 }
             }
@@ -295,14 +418,19 @@ namespace BusinessLayer
                     var minday = int.Parse(thismonth.Where(x => x.Temperature == min).Select(x => x.Day).ToList()[0].ToString());
                     var maxday = int.Parse(thismonth.Where(x => x.Temperature == max).Select(x => x.Day).ToList()[0].ToString());
                     var avg = thismonth.Average(x => x.Temperature);
+                    var skymonth = thismonth.Where(x => x.Sky != "");
+                    var avgSky = skymonth.GroupBy(a => a.Sky).OrderByDescending(g => g.Count()).First().Key;
+                    if (avgSky == "")
+                        avgSky = "errors";
                     var mdata = new YData
                     {
                         Month = MonthNumToMonthName(Data.Month),
                         Max = max + "°C",
                         Min = min + "°C",
-                        AverageOfMonth = Math.Round(avg, 2) + "°C",
-                        MaxDay = maxday + "",
-                        MinDay = minday + ""
+                        AverageTempOfMonth = Math.Round(avg, 2) + "°C",
+                        MaxDay = GetOrdinalNumber(maxday, MonthNumToMonthName(Data.Month)),
+                        MinDay = GetOrdinalNumber(minday, MonthNumToMonthName(Data.Month)),
+                        AverageSkyOfMonth = $@"~\images\{avgSky}.png"
                     };
                     list.Add(mdata);
                 }
@@ -310,36 +438,7 @@ namespace BusinessLayer
 
             return list;
         }
-        public List<MData> GetAnyMonth(int month)
-        {
 
-            var themonth = dbl.GetAnyMonth(month);
-            var list = new List<MData>();
-            foreach (WeatherFromSQL Data in themonth)
-            {
-
-                var today = themonth.Where(x => x.Day == Data.Day);
-                if (list.Where(x => x.Day == Data.Day).Count() == 0)
-                {
-                    var max = today.Max(x => x.Temperature);
-                    var min = today.Where(x => x.Day == Data.Day).Min(x => x.Temperature);
-                    var minhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == min).Select(x => x.Hour).ToList()[0].ToString());
-                    var maxhour = int.Parse(today.Where(x => x.Day == Data.Day && x.Temperature == max).Select(x => x.Hour).ToList()[0].ToString());
-                    var mdata = new MData
-                    {
-                        Day = Data.Day,
-                        Max = max + "°C",
-                        Min = min + "°C",
-                        Average = Math.Round(today.Average(x => x.Temperature), 2) + "°C",
-                        MaxHour = maxhour + ":00",
-                        MinHour = minhour + ":00"
-                    };
-                    list.Add(mdata);
-                }
-            }
-
-            return list;
-        }
         public void EnableTexts(List<MonthDataFormat> weatherlist, Label Min, Label Max, Label Average, Label MaxHour, Label MinHour, Chart ChartTemp)
         {
             ChartTemp.Visible = true;
@@ -391,10 +490,6 @@ namespace BusinessLayer
             MaxHour.Visible = false;
             chart.Visible = false;
         }
-        public List<WeatherFromSQL> UpdateGridViewOnDropDownMonth(DropDownList Month, DropDownList Year)
-        {
 
-            return dbl.UpdateGridViewOnDropDownMonth(Month, Year);
-        }
     }
 }

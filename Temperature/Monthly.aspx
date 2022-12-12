@@ -16,7 +16,7 @@
             <br />
             <asp:DropDownList ID="MonthDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
-            <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
+            <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDownYear">
             </asp:DropDownList>
             <br />
             <asp:Button ID="Increment" runat="server" Text="<" OnClick="Increment_Click" />
@@ -47,9 +47,11 @@
                     <asp:BoundField DataField="MinHour" HeaderText="Time of the lowest temperature" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
-                    <asp:BoundField DataField="Average" HeaderText="Average Temperature of the day" ItemStyle-Width="150" >
+                    <asp:BoundField DataField="AverageTemp" HeaderText="Average Temperature of the day" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
+                     <asp:ImageField DataImageUrlField="AverageSky" HeaderText="Sky">
+                </asp:ImageField>
                      </Columns>
             </asp:GridView>
             

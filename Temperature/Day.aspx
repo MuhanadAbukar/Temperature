@@ -54,6 +54,8 @@
                     <asp:BoundField DataField="WindDirection" HeaderText="Wind Direction" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>                        
                     </asp:BoundField>
+                    <asp:ImageField DataImageUrlField="image" HeaderText="Sky">
+                </asp:ImageField>
                 </Columns>
             </asp:GridView>
         </div>
@@ -72,7 +74,7 @@
             <asp:chart id="ChartTemp" runat="server" 
                ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
                BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
-               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="364px" Width="1177px" 
                EnableViewState="True">
                <legends>
                   <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>
@@ -92,7 +94,6 @@
                      <axisx linecolor="#38505d" IsLabelAutoFit="False">
                         <labelstyle font="Helvetica Neue, 8.25pt, style=Bold" ForeColor="#38505d" />
                         <majorgrid linecolor="#38505d" />
-                         
                      </axisx>
                   </asp:chartarea>
                </chartareas>

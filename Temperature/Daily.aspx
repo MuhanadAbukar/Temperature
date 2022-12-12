@@ -13,11 +13,11 @@
             <asp:Button ID="Monthly" runat="server" Text="Data from any month" OnClick="Month_Click" />
             <asp:Button ID="Year" runat="server" Text="Yearly Data" OnClick="Month_Click" />
             <br />
-            <asp:DropDownList ID="DayDrop" runat="server" AutoPostBack="True">
+            <asp:DropDownList ID="DayDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDownDay">
             </asp:DropDownList>
             <asp:DropDownList ID="MonthDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
             </asp:DropDownList>
-            <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDown">
+            <asp:DropDownList ID="YearDrop" runat="server" AutoPostBack="True" OnSelectedIndexChanged="ChangedDropDownYear">
             </asp:DropDownList>
             <br />
             <asp:Button ID="Increment" runat="server" Text="<" OnClick="Increment_Click"/>
@@ -54,6 +54,8 @@
                   <asp:BoundField DataField="WindDirection" HeaderText="Wind Direction" ItemStyle-Width="150" >
                      <ItemStyle Width="150px"></ItemStyle>
                   </asp:BoundField>
+                   <asp:ImageField DataImageUrlField="image" HeaderText="Sky">
+                </asp:ImageField>
                </Columns>
             </asp:GridView>
             <asp:Label ID="Max" runat="server" Text=""></asp:Label>
@@ -67,11 +69,13 @@
             <br />
             <br />
             <asp:Label ID="Average" runat="server" Text=""></asp:Label>
+            
+             <br />
              <br />
             <asp:chart id="ChartTemp" runat="server" 
                ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
                BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
-               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="364px" Width="1177px" 
                EnableViewState="True">
                <legends>
                   <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>

@@ -12,5 +12,6 @@
         public double Humidity { get; set; }
         public double WindSpeedGust { get; set; }
         public double WindDirection { get; set; }
+        public string Sky { get; set; }
     }
 }

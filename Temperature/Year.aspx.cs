@@ -11,13 +11,10 @@ namespace Temperature
             if (!IsPostBack)
             {
                 var bs = new BL();
-                bs.IntializeDropDownsForYear(Year123);
+                bs.IntializeDropDownsForYear(YearDropDown);
                 UpdateGridAndChart();
             }
         }
-
-
-
         protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateGridAndChart();
@@ -29,7 +26,7 @@ namespace Temperature
         protected void UpdateGridAndChart()
         {
             var bs = new BL();
-            var weatherlist = bs.GetYear(int.Parse(Year123.SelectedValue));
+            var weatherlist = bs.GetYear(int.Parse(YearDropDown.SelectedValue));
             GridView1.DataSource = weatherlist;
             GridView1.DataBind();
             bs.CreateChartYear(ChartTemp, weatherlist);

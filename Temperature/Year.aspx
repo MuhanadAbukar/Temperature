@@ -14,7 +14,7 @@
             <asp:Button ID="Monthly" runat="server" Text="Data from any month" OnClick="Month_Click" />
             <asp:Button ID="Year1" runat="server" Text="Yearly Data" OnClick="Month_Click" />
             <br />
-            <asp:DropDownList ID="Year123" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Year_SelectedIndexChanged" ></asp:DropDownList>
+            <asp:DropDownList ID="YearDropDown" runat="server" AutoPostBack="true" OnSelectedIndexChanged="Year_SelectedIndexChanged" ></asp:DropDownList>
             <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" BackColor="#CCCCCC" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" ForeColor="Black">
                 <Columns>
                     <asp:BoundField DataField="Month" HeaderText="Month" ItemStyle-Width="150" >
@@ -32,9 +32,11 @@
                     <asp:BoundField DataField="MinDay" HeaderText="Day of the lowest temperature" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
-                    <asp:BoundField DataField="AverageOfMonth" HeaderText="Average Temperature of the month" ItemStyle-Width="150" >
+                    <asp:BoundField DataField="AverageTempOfMonth" HeaderText="Average Temperature of the month" ItemStyle-Width="150" >
 <ItemStyle Width="150px"></ItemStyle>
                     </asp:BoundField>
+                     <asp:ImageField DataImageUrlField="AverageSkyOfMonth" HeaderText="Average Sky">
+                </asp:ImageField>
                 </Columns>
                 <FooterStyle BackColor="#CCCCCC" />
                 <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
@@ -52,7 +54,7 @@
             <asp:chart id="ChartTemp" runat="server" 
                ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
                BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
-               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="364px" Width="1177px" 
                EnableViewState="True">
                <legends>
                   <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>

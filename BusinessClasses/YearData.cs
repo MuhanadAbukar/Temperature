@@ -7,6 +7,7 @@
         public string MaxDay { get; set; }
         public string Min { get; set; }
         public string MinDay { get; set; }
-        public string AverageOfMonth { get; set; }
+        public string AverageTempOfMonth { get; set; }
+        public string AverageSkyOfMonth { get; set; }
     }
 }
