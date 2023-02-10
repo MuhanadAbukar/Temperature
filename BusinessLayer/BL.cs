@@ -19,45 +19,87 @@ namespace BusinessLayer
         {
             return weatherlist.GroupBy(a => a.image).OrderByDescending(g => g.Count()).First().Key;
         }
-        public void IntializeDropDowns(DropDownList DropDownList1, DropDownList DropDownList2, DropDownList DropDownList3)
+        public void UpdateMonthsOfYear(string year, DropDownList month)
         {
-            int z = 0;
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            if (DropDownList2.Items.Count == 0)
+            month.Items.Clear();
+            var val = dbl.GetValidMonthsOfYear(year);
+            int i = 0;
+            foreach (DataRow dr in val.Rows)
             {
-                var months = dbl.GetValidMonths();
-                foreach (DataRow dr in months.Rows)
-                {
-                    DropDownList2.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
-                    z++;
-
-                }
+                
+                month.Items.Insert(i, new ListItem( MonthNumToMonthName( (int)dr[0]), MonthNumToMonthName((int)dr[0])));
+                i++;
             }
-            DropDownList3.Items.Clear();
-            var oldind = DropDownList1.SelectedIndex;
-            DropDownList1.Items.Clear();
-            var monthnum = MonthNameToMonthNum(DropDownList2.SelectedValue);
-            var monthname = MonthNumToMonthName(monthnum);
-            var month = Array.IndexOf(months1, monthname);
-            var days = dbl.GetValidDaysOfMonth(month + 1);
-            z = 0;
+        }
+        public void UpdateDaysOfMonth(int month, DropDownList day, int year)
+        {
+            day.Items.Clear();
+            var days = dbl.GetValidDaysOfMonth(month,year);
+            
+        }
+        public void InsertDaysToDayDropDown(DataTable data, DropDownList daydrop)
+        {
+            int i = 0;
+            foreach (DataRow dr in data.Rows)
+            {
+                daydrop.Items.Insert(i, new ListItem(dr[0].ToString(), dr[0].ToString()));
+                i++;
+            }
+        }
+        public void InsertYearsToYearDropDown(DataTable data, DropDownList yeardrop)
+        {
+            int i = 0;
+            foreach (DataRow dr in data.Rows)
+            {
+                yeardrop.Items.Insert(i, new ListItem(dr[0].ToString(), dr[0].ToString()));
+                i++;
+            }
+        }
+        public void InsertMonthsToMonthDropDown(DataTable data, DropDownList monthdrop)
+        {
+            int i = 0;
+            foreach (DataRow dr in data.Rows)
+            {
+                monthdrop.Items.Insert(i, new ListItem(MonthNumToMonthName((int)dr[0]), MonthNumToMonthName((int)dr[0])));
+                i++;
+            }
+        }
+        public void IntializeDropDownsForMonthChanged(DropDownList Day, DropDownList Month, DropDownList Year)
+        {
+            Day.Items.Clear();
+            var days = dbl.GetValidDaysOfMonth(MonthNameToMonthNum(Month.SelectedValue),int.Parse(Year.SelectedValue));
+            int i = 0;
             foreach (DataRow dr in days.Rows)
             {
-                DropDownList1.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
-                z++;
+                Day.Items.Insert(i, new ListItem(dr[0].ToString(), dr[0].ToString()));
+                i++;
             }
-            try
+        }
+        public void IntializeDropDownsForYearChanged(DropDownList Day, DropDownList Month, DropDownList Year)
+        {
+            var months = dbl.GetValidMonthsOfYear(Year.SelectedValue);
+            Month.Items.Clear();
+            InsertMonthsToMonthDropDown(months, Month);
+            Day.Items.Clear();
+            var days = dbl.GetValidDaysOfMonth(MonthNameToMonthNum(Month.SelectedValue), int.Parse(Year.SelectedValue));
+            InsertDaysToDayDropDown(days, Day);
+        }
+        public void IntializeDropDowns(DropDownList Day, DropDownList Month, DropDownList Year)
+        {
+            int i = 0;
+            if (Month.Items.Count == 0)
             {
-                DropDownList1.SelectedIndex = oldind;
+                var months = dbl.GetValidMonthsOfYear(DateTime.Now.Year.ToString());
+                InsertMonthsToMonthDropDown(months, Month);
             }
-            catch (ArgumentOutOfRangeException) { }
+            var year = DateTime.Now.Year;
+            Year.Items.Clear();
+            Day.Items.Clear();
+            var month = MonthNameToMonthNum(Month.SelectedValue);
+            var days = dbl.GetValidDaysOfMonth(month,year);
             var years = dbl.GetValidYears();
-            z = 0;
-            foreach (DataRow dr in years.Rows)
-            {
-                DropDownList3.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
-                z++;
-            }
+            InsertDaysToDayDropDown(days, Day);
+            InsertYearsToYearDropDown(years, Year);
         }
         public void IntializeDropDownsForYear(DropDownList Year)
         {
@@ -73,23 +115,16 @@ namespace BusinessLayer
         public void IntializeDropDownsForMonth(DropDownList Month, DropDownList Year)
         {
             Month.SelectedIndex = 0;
-            var months = dbl.GetValidMonths();
-            var months1 = new[] { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-            int z = 0;
-            foreach (DataRow dr in months.Rows)
-            {
-                Month.Items.Insert(z, new ListItem(months1[(int)dr[0] - 1], months1[(int)dr[0] - 1]));
-                z++;
-
-            }
+            var months = dbl.GetValidMonthsOfYear(DateTime.Now.Year.ToString());
             var years = dbl.GetValidYears();
-            z = 0;
-            foreach (DataRow dr in years.Rows)
-            {
-                Year.Items.Insert(z, new ListItem(dr[0].ToString(), dr[0].ToString()));
-                z++;
-            }
+            InsertMonthsToMonthDropDown(months, Month);
+            InsertYearsToYearDropDown(years, Year);
+            Year.SelectedIndex = 0;
             Month.SelectedIndex = 0;
+        }
+        public void IntializeDropDownsForDayOnYearChanged(DropDownList Day, DropDownList Month)
+        {
+
         }
         private string GetOrdinalNumber(int num, string month)
         {
@@ -253,8 +288,8 @@ namespace BusinessLayer
 
         public List<MonthDataFormat> GetLast24Hours()
         {
-
-            return dbl.GetLast24Hours();
+            var db = new DBL();
+            return db.GetLast24Hours();
         }
         public void CreateChartDay(Chart ChartTemp, List<MonthDataFormat> weatherlist)
         {
@@ -268,9 +303,9 @@ namespace BusinessLayer
                 };
                 list.Add(cr);
             }
-
             ChartTemp.Series.Clear();
             ChartTemp.DataBindTable(list, "Hour");
+            ChartTemp.Series[0].IsXValueIndexed = true;
             ChartTemp.Series[0].ChartType = SeriesChartType.Line;
             var pointCounter = 0;
             ChartTemp.ChartAreas[0].AxisX.LabelStyle.Interval = 1;

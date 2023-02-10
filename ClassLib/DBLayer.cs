@@ -38,7 +38,7 @@ namespace DBLayer
     }
     public class DBL
     {
-        static string connstr = "Data Source=DESKTOP-QJBSGQ4\\MSSQLSERVER01;Initial Catalog=Harvester_Muhanad;Persist Security Info=True;User ID=sa;Password=muhanad123";
+        static string connstr = "Data Source=itaserver;Initial Catalog=Harvester_Muhanad;Persist Security Info=True;User ID=muhanadharvester;Password=muhanad123";
         static SqlConnection conn = new SqlConnection(connstr);
         private WeatherFromSQL CreateObjectFromSql(SqlDataReader reader)
         {
@@ -99,9 +99,9 @@ namespace DBLayer
                 return dat;
             }
         }
-        public DataTable GetValidDaysOfMonth(int month)
+        public DataTable GetValidDaysOfMonth(int month, int year)
         {
-            var cmd = new SqlCommand($"select distinct day from tempdatar where month = {month} order by day", conn);
+            var cmd = new SqlCommand($"select distinct day from tempdatar where month = {month} and year = {year} order by day", conn);
             conn.Open();
             var dt = new DataTable();
             dt.Load(cmd.ExecuteReader());
@@ -112,6 +112,16 @@ namespace DBLayer
         {
             var cmd = new SqlCommand("select distinct Month from tempdatar order by month desc", conn);
             conn.Open();
+            var dt = new DataTable();
+            dt.Load(cmd.ExecuteReader());
+            conn.Close();
+            return dt;
+        }
+        public DataTable GetValidMonthsOfYear(string year)
+        {
+            var cmd = new SqlCommand("select distinct Month from tempdatar where year = @year order by month desc", conn);
+            conn.Open();
+            cmd.Parameters.AddWithValue("year",year);
             var dt = new DataTable();
             dt.Load(cmd.ExecuteReader());
             conn.Close();
@@ -135,7 +145,7 @@ namespace DBLayer
         public List<MonthDataFormat> GetLast24Hours()
         {
             var list = new List<MonthDataFormat>();
-            var z = new SqlCommand("select * from tempdatar where day=day(Cast(Getdate() as date)) and month = month(Cast(Getdate() as date)) and year = year(Cast(Getdate() as date))", conn);
+            var z = new SqlCommand("select top(24)*from tempdatar\r\norder by id desc", conn);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())

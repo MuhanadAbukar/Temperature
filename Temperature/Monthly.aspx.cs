@@ -73,8 +73,8 @@ namespace Temperature
         {
             var bs = new BL();
             var DATA = weatherFromSQLs;
-            var year = int.Parse(YearDrop.SelectedItem.Text);
-            var month = bs.MonthNameToMonthNum(MonthDrop.SelectedItem.Text);
+            var year = int.Parse(YearDrop.SelectedValue);
+            var month = bs.MonthNameToMonthNum(MonthDrop.SelectedValue);
             var SelectedData = DATA.Where(x => x.Month == month).ToList();
             var weatherlist = bs.ParseWeatherDataToMonthReport(SelectedData);
             weatherlist.Reverse();
@@ -82,17 +82,19 @@ namespace Temperature
             GridView2.DataBind();
             if (weatherlist.Count > 0)
             {
-                //bs.CreateChartMonth(ChartTemp, weatherlist);
+                bs.CreateChartMonth(ChartTemp, weatherlist);
 
             }
             
         }
         protected void ChangedDropDownYear(object sender, EventArgs e)
         {
-            var year = YearDrop.SelectedItem.Text;
+            var year = YearDrop.SelectedValue;
             weatherFromSQLs.Clear();
             var bs = new BL();
             weatherFromSQLs = bs.GetAnyYear(int.Parse(year));
+            bs.UpdateMonthsOfYear(year,MonthDrop);
+            UpdateGridAndChart();
         }
     }
 }

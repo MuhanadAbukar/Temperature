@@ -59,7 +59,7 @@
              <asp:chart id="ChartTemp" runat="server" 
                ImageLocation="~/TempImages/ChartPic_#SEQ(300,3)" BorderWidth="2px" 
                BackGradientStyle="TopBottom" BackSecondaryColor="White" Palette="None" 
-               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="296px" Width="790px" 
+               BorderlineDashStyle="Solid" BorderColor="#38505D" Height="379px" Width="1056px" 
                EnableViewState="True">
                <legends>
                   <asp:legend Enabled="True" IsTextAutoFit="False" Name="Default" BackColor="Transparent" Font="Helvetica Neue, 8.25pt, style=Bold"></asp:legend>

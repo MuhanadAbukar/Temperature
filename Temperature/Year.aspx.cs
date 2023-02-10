@@ -15,10 +15,7 @@ namespace Temperature
                 UpdateGridAndChart();
             }
         }
-        protected void DropDownList2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateGridAndChart();
-        }
+        
         protected void Month_Click(object sender, EventArgs e)
         {
             Response.Redirect((((Button)sender).ID + ".aspx").Replace("1", ""));
@@ -30,13 +27,12 @@ namespace Temperature
             GridView1.DataSource = weatherlist;
             GridView1.DataBind();
             bs.CreateChartYear(ChartTemp, weatherlist);
-
         }
 
         protected void Year_SelectedIndexChanged(object sender, EventArgs e)
         {
             var bs = new BL();
-            var weatherlist = bs.GetLastYear();
+            var weatherlist = bs.GetYear(int.Parse(YearDropDown.SelectedValue));
             GridView1.DataSource = weatherlist;
             GridView1.DataBind();
             bs.CreateChartYear(ChartTemp, weatherlist);
