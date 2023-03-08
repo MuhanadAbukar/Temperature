@@ -47,14 +47,9 @@ namespace Temperature
         {
             if (MonthDrop.SelectedIndex < 12)
             {
-                try
-                {
+                
                     MonthDrop.SelectedIndex++;
                     UpdateGridAndChart();
-
-
-                }
-                catch (ArgumentOutOfRangeException) { }
 
             }
         }
@@ -83,7 +78,6 @@ namespace Temperature
             if (weatherlist.Count > 0)
             {
                 bs.CreateChartMonth(ChartTemp, weatherlist);
-
             }
             
         }

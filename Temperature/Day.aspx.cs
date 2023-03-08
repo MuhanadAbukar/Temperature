@@ -17,7 +17,7 @@ namespace Temperature
                 GridView1.DataBind();
                 bs.EnableTexts(weatherlist, Min, Max, Average, MaxHour, MinHour, ChartTemp);
                 bs.CreateChartDay(ChartTemp, weatherlist);
-                var currentTemp = weatherlist[weatherlist.Count - 1].Temperature;
+                var currentTemp = weatherlist[0].Temperature;
                 h1.InnerHtml = $"Current Temperature: {currentTemp}";
             }
         }

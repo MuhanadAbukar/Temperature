@@ -50,7 +50,8 @@ namespace DBLayer
                 Hour = (int)reader["Hour"],
                 Temperature = (double)reader["Temperature"],
                 WindSpeed = (double)reader["WindSpeed"],
-                Precipitation = (double)reader["Precipitation"],
+                Precipitation_Rate = (double)reader["Precipitation_Rate"],
+                Precipitation_Amount = (double)reader["Precipitation_Amount"],
                 Humidity = (double)reader["Humidity"],
                 WindSpeedGust = (double)reader["WindSpeedGust"],
                 WindDirection = (double)reader["WindDirection"],
@@ -82,13 +83,12 @@ namespace DBLayer
             {//69.649570, 18.956684
 
 
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create($"https://api.met.no/weatherapi/nowcast/2.0/complete?lat=59.218633&lon=10.942062");
-                httpWebRequest.UserAgent = "Muhanad";
-                var httpResponse = httpWebRequest.GetResponse();
-                var streamReader = new StreamReader(httpResponse.GetResponseStream());
-                var result = streamReader.ReadToEnd();
-                var real = JsonConvert.DeserializeObject<WeatherData.WeatherData>(result);
-                var properties = real.properties.timeseries[0].data;
+                var http = new HttpClient();
+                http.DefaultRequestHeaders.Add("User-Agent", "Muhanad");
+                var str = http.GetAsync("https://api.met.no/weatherapi/nowcast/2.0/complete?lat=59.218633&lon=10.942062");
+                var result = str.Result.Content.ReadAsStringAsync().Result;
+                var json = JsonConvert.DeserializeObject<WeatherData.WeatherData>(result);
+                var properties = json.properties.timeseries[0].data;
                 return properties;
             }
             catch (Exception m)
@@ -156,7 +156,8 @@ namespace DBLayer
                     Hour = reader["Hour"] + ":00",
                     Temperature = reader["Temperature"] + "°C",
                     WindSpeed = reader["WindSpeed"] + " m/s",
-                    Precipitation = reader["Precipitation"] + " mm",
+                    Precipitation_Rate = reader["Precipitation_Rate"] + " mm/h",
+                    Precipitation_Amount = reader["Precipitation_Amount"] + " mm/h",
                     Humidity = reader["Humidity"] + "%",
                     WindSpeedGust = reader["WindSpeedGust"] + " m/s",
                     WindDirection = AngleToDirection(angle),
@@ -171,7 +172,7 @@ namespace DBLayer
         public List<WeatherFromSQL> GetLastMonth()
         {
             var list = new List<WeatherFromSQL>();
-            var z = new SqlCommand("select * from tempdatar where month = month(Cast(Getdate() as date)) and year = year(Cast(Getdate() as date))", conn);
+            var z = new SqlCommand("SELECT  *\r\nFROM tempdatar\r\nWHERE (YEAR(GETDATE()) = [Year] AND MONTH(GETDATE()) = [Month] AND DAY(GETDATE()) - [Day] <= 30)\r\nOR (YEAR(GETDATE()) = [Year] AND MONTH(GETDATE()) - [Month] = 1 AND DAY(GETDATE()) + (30 - [Day]) <= 30)\r\nOR (YEAR(GETDATE()) = [Year] - 1 AND MONTH(GETDATE()) = 12 AND MONTH([Month]) = 1 AND DAY(GETDATE()) + (30 - [Day]) <= 30)\r\nORDER BY [Id] DESC", conn);
             conn.Open();
             var reader = z.ExecuteReader();
             while (reader.Read())
@@ -216,7 +217,7 @@ namespace DBLayer
 
 
 
-        public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation, float humidity, float gust, float direction, string skycode)
+        public void InsertTemperatureWithDate(float temp, float windspeed, float precipitation_rate,float precipitation_amount, float humidity, float gust, float direction, string skycode)
         {
             conn.Open();
             var dt = DateTime.Now;
@@ -224,7 +225,7 @@ namespace DBLayer
             var mnth = dt.Month;
             var day = dt.Day;
             var hour = dt.Hour;
-            var cmd = new SqlCommand($"insert into TempDataR values({yr},{mnth},{day},{hour},{temp},{windspeed},{precipitation},{humidity},{gust}, {direction},'{skycode}')", conn);
+            var cmd = new SqlCommand($"insert into TempDataR values({yr},{mnth},{day},{hour},{temp},{windspeed},{precipitation_rate},{precipitation_amount},{humidity},{gust}, {direction},'{skycode}')", conn);
             cmd.ExecuteNonQuery();
             conn.Close();
         }

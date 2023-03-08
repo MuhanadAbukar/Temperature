@@ -210,7 +210,8 @@ namespace BusinessLayer
                         Hour = weatherFromSQL.Hour + ":00",
                         Temperature = weatherFromSQL.Temperature + "°C",
                         WindSpeed = weatherFromSQL.WindSpeed + " m/s",
-                        Precipitation = weatherFromSQL.Precipitation + " mm",
+                        Precipitation_Amount = weatherFromSQL.Precipitation_Amount + " mm",
+                        Precipitation_Rate = weatherFromSQL.Precipitation_Rate + " mm/h",
                         Humidity = weatherFromSQL.Humidity + "%",
                         WindSpeedGust = weatherFromSQL.WindSpeedGust + " m/s",
                         WindDirection = AngleToDirection(angle),
@@ -224,7 +225,8 @@ namespace BusinessLayer
                         Hour = weatherFromSQL.Hour + ":00",
                         Temperature = weatherFromSQL.Temperature + "°C",
                         WindSpeed = weatherFromSQL.WindSpeed + " m/s",
-                        Precipitation = weatherFromSQL.Precipitation + " mm",
+                        Precipitation_Rate = weatherFromSQL.Precipitation_Rate + " mm/h",
+                        Precipitation_Amount = weatherFromSQL.Precipitation_Amount+" mm",
                         Humidity = weatherFromSQL.Humidity + "%",
                         WindSpeedGust = weatherFromSQL.WindSpeedGust + " m/s",
                         WindDirection = AngleToDirection(angle),
@@ -282,7 +284,7 @@ namespace BusinessLayer
                     list.Add(mdata);
                 }
             }
-
+            list.Reverse();
             return list;
         }
 
@@ -303,6 +305,7 @@ namespace BusinessLayer
                 };
                 list.Add(cr);
             }
+            list.Reverse();
             ChartTemp.Series.Clear();
             ChartTemp.DataBindTable(list, "Hour");
             ChartTemp.Series[0].IsXValueIndexed = true;
@@ -336,6 +339,7 @@ namespace BusinessLayer
             var pointCounter = 0;
             ChartTemp.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
             ChartTemp.Series[0].LegendText = "Temperature";
+            ChartTemp.Series[0].IsXValueIndexed = true;
             foreach (DataPoint p in ChartTemp.Series[0].Points)
             {
                 var label = ChartTemp.Series[0].Label;

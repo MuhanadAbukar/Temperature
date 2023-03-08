@@ -39,7 +39,10 @@
                   <asp:BoundField DataField="Temperature" HeaderText="Temperature" ItemStyle-Width="150" >
                      <ItemStyle Width="150px"></ItemStyle>
                   </asp:BoundField>
-                  <asp:BoundField DataField="Precipitation" HeaderText="Precipitation" ItemStyle-Width="150" >
+                  <asp:BoundField DataField="Precipitation_Rate" HeaderText="Precipitation Rate" ItemStyle-Width="150" >
+                     <ItemStyle Width="150px"></ItemStyle>
+                  </asp:BoundField>
+                   <asp:BoundField DataField="Precipitation_Amount" HeaderText="Precipitation Rate" ItemStyle-Width="150" >
                      <ItemStyle Width="150px"></ItemStyle>
                   </asp:BoundField>
                   <asp:BoundField DataField="Humidity" HeaderText="Humidity" ItemStyle-Width="150" >

@@ -78,7 +78,6 @@ namespace Temperature
             var day = int.Parse(DayDrop.SelectedValue);
             var SelectedData = DATA.Where(x => x.Day == day && x.Month == month).ToList();
             var weatherlist = bs.ParseWeatherDataToDayReport(SelectedData);
-            weatherlist.Reverse();
             GridView2.DataSource = weatherlist;
             GridView2.DataBind();
             if (weatherlist.Count > 0)

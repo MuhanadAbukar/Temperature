@@ -8,7 +8,8 @@
         public int Hour { get; set; }
         public double Temperature { get; set; }
         public double WindSpeed { get; set; }
-        public double Precipitation { get; set; }
+        public double Precipitation_Rate { get; set; }
+        public double Precipitation_Amount { get; set; }
         public double Humidity { get; set; }
         public double WindSpeedGust { get; set; }
         public double WindDirection { get; set; }
